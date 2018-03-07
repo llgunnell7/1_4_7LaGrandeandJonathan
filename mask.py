@@ -4,16 +4,10 @@ import os.path
 import PIL.ImageDraw            
 
 def redlogo(original_image,red,template):
-    """ Rounds the corner of a PIL.Image
-    
-    original_image must be a PIL.Image
-    Returns a new PIL.Image with rounded corners, where
-    0 < percent_of_side < 1
-    is the corner radius as a portion of the shorter dimension of original_image
+    """ resizes the original image to template, creates a mask out of the top portion, and then creates the top portion
     """
-    #set the radius of the rounded corners
-    width, height = template.size
-    resized_image = original_image.resize((width,height))
+    width, height = template.size #defines the size of the picture
+    resized_image = original_image.resize((width,height)) #resizes original image to paste it
     
     
     ###
@@ -26,27 +20,14 @@ def redlogo(original_image,red,template):
     
     # Overwrite the RGBA values with A=255.
     # The 127 for RGB values was used merely for visualizing the mask
-    rounded_mask.paste(red, (0,0))
-    # Uncomment the following line to show the mask
-    # plt.imshow(rounded_mask)
-    
-    # Make the new image, starting with all transparent
-    
-    #resizes the image to 200 to 200 for easy pasting
-   
-    
+    rounded_mask.paste(red, (0,0))#paste the red portion of the logo into the mask
+
     result = PIL.Image.new('RGBA', template.size, (0,0,0,0))
-    result.paste(resized_image, (0,0), mask=rounded_mask)
+    result.paste(resized_image, (0,0), mask=rounded_mask)#paste the new image, but use the red as a mask
     return result
 def bluelogo(original_image,blue,template):
-    """ Rounds the corner of a PIL.Image
-    
-    original_image must be a PIL.Image
-    Returns a new PIL.Image with rounded corners, where
-    0 < percent_of_side < 1
-    is the corner radius as a portion of the shorter dimension of original_image
+    """ This is the exact same as redlogo, but its for the bottom portion
     """
-    #set the radius of the rounded corners
     width, height = template.size
     resized_image = original_image.resize((width,height))
     
@@ -60,26 +41,12 @@ def bluelogo(original_image,blue,template):
     drawing_layer = PIL.ImageDraw.Draw(rounded_mask)
     
     # Overwrite the RGBA values with A=255.
-    # The 127 for RGB values was used merely for visualizing the mask
     rounded_mask.paste(blue, (0,0))
-    # Uncomment the following line to show the mask
-    # plt.imshow(rounded_mask)
-    
-    # Make the new image, starting with all transparent
-    
-    #resizes the image to 200 to 200 for easy pasting
-   
-    
     result = PIL.Image.new('RGBA', template.size, (0,0,0,0))
     result.paste(resized_image, (0,0), mask=rounded_mask)
     return result
 def get_images(directory=None):
-    """ Returns PIL.Image objects for all the images in directory.
-    
-    If directory is not specified, uses current directory.
-    Returns a 2-tuple containing 
-    a list with a  PIL.Image object for each image file in root_directory, and
-    a list with a string filename for each image file in root_directory
+    """ This was not edited from the source, mask.py from 1.4.5
     """
     
     if directory == None:
@@ -101,40 +68,36 @@ def get_images(directory=None):
     return image_list, file_list
 
 def pepsi(directory=None):
-    """ Saves a modfied version of each image in directory.
-    
-    Uses current directory if no directory is specified. 
-    Places images in subdirectory 'modified', creating it if it does not exist.
-    New image files are of type PNG and have transparent rounded corners.
+    """ this creates the main pepsi logo from the 1.jpeg and 2.jpg in the directory
     """
     
     if directory == None:
         directory = os.getcwd() # Use working directory if unspecified
         
-    # Create a new directory 'modified'
-    new_directory = os.path.join(directory, 'modified')
+    # Create a new directory 'pepsi'
+    new_directory = os.path.join(directory, 'pepsi')
     try:
         os.mkdir(new_directory)
     except OSError:
         pass # if the directory already exists, proceed  
     
     #load all the images
-    image_list, file_list = get_images(directory)  
+    image_list, file_list = get_images(directory) #this step is unneccesary as the lines below do it instead, but in the future we will add support for multiple images  
 
-    #go through the images and save modified versions
+    #open all of the images for use
     red = PIL.Image.open(os.path.join(directory, 'red.png'))
     blue = PIL.Image.open(os.path.join(directory, 'blue.png'))
     template =PIL.Image.open(os.path.join(directory, 'template.png'))
     topp = PIL.Image.open(os.path.join(directory, '1.jpeg'))
     bottomm = PIL.Image.open(os.path.join(directory, '2.jpg'))
         
-    # Round the corners with radius = 30% of short side
-
-    top = redlogo(topp,red,template)
-    bottom = bluelogo(bottomm,blue,template)
-    new_image = template
-    new_image.paste(bottom,(0,0), mask=bottom)
+    top = redlogo(topp,red,template)#creates the top portion of the pepsi logo
+    bottom = bluelogo(bottomm,blue,template)#creates the bottom portion of the pepsi logo
+    
+    new_image = template#creates a new image based on template
+    new_image.paste(bottom,(0,0), mask=bottom)#pastes the top and bottom onto the new image
     new_image.paste(top,(0,0), mask=top)
-    #save the altered image, suing PNG to retain transparency
+    
+    #save the new image, suing PNG to retain transparency
     new_image_filename = os.path.join(new_directory, 'final' + '.png')
     new_image.save(new_image_filename)    #9b: 
