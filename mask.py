@@ -133,8 +133,8 @@ def pepsi(directory=None):
     top = redlogo(topp,red,template)
     bottom = bluelogo(bottomm,blue,template)
     new_image = template
-    new_image.paste(top,(0,0))
-    new_image.paste(bottom,(0,0))
+    new_image.paste(bottom,(0,0), mask=bottom)
+    new_image.paste(top,(0,0), mask=top)
     #save the altered image, suing PNG to retain transparency
     new_image_filename = os.path.join(new_directory, 'final' + '.png')
     new_image.save(new_image_filename)    #9b: 
